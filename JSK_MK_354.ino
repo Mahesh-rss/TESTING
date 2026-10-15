@@ -48,7 +48,7 @@ String longitude;
 unsigned long baseMillis = 0;
 time_t baseEpoch = 0;
 
-String deviceType = "3P-Adv";
+String deviceType ;
 
 // SD Card Pin Definitions
 #define SD_CS_PIN 48  // SD Card uses HSPI pins
@@ -117,8 +117,6 @@ float IHR_ = 0.0;
 float IHY_ = 0.0;
 float IHB_ = 0.0;
 
-float PE_ = 0.0;
-float NE_ = 0.0;
 
 float CrestVR_ = 0.0;
 float CrestVY_ = 0.0;
@@ -1437,8 +1435,7 @@ void addJSY354MainValues(JsonDocument &docu, uint16_t *allRegs)
   VLNAVG_ = (VR_ + VY_ + VB_) / 3.0;
   VLLAVG_ = (VRY_ + VYB_ + VBR_) / 3.0;
   IAVG_ = (IR_ + IY_ + IB_) / 3.0;
-  PE_ = totalPositiveActiveEnergy / 100.0;
-  NE_ = totalReverseActiveEnergy / 100.0;
+ 
 
   VHR_ = allRegs[96] / 100.0;
   VHY_ = allRegs[97] / 100.0;
@@ -1487,22 +1484,22 @@ void addJSY354MainValues(JsonDocument &docu, uint16_t *allRegs)
   docu["PF_R"] = String(allRegs[22] / 1000.0, 3);
   docu["PF_Y"] = String(allRegs[23] / 1000.0, 3);
   docu["PF_B"] = String(allRegs[24] / 1000.0, 3);
-  docu["PF_TOTAL"] = String(allRegs[25] / 1000.0, 3);
+  docu["PF"] = String(allRegs[25] / 1000.0, 3);
 
   docu["WATTS_R"] = String(allRegs[6]);
   docu["WATTS_Y"] = String(allRegs[7]);
   docu["WATTS_B"] = String(allRegs[8]);
-  docu["WATTS_TOTAL"] = String(totalActivePower);
+  docu["WT"] = String(totalActivePower);
 
   docu["VAR_R"] = String(allRegs[11]);
   docu["VAR_Y"] = String(allRegs[12]);
   docu["VAR_B"] = String(allRegs[13]);
-  docu["VAR_TOTAL"] = String(totalReactivePower);
+  docu["VAR"] = String(totalReactivePower);
 
   docu["VA_R"] = String(allRegs[16]);
   docu["VA_Y"] = String(allRegs[17]);
   docu["VA_B"] = String(allRegs[18]);
-  docu["VA_TOTAL"] = String(totalApparentPower);
+  docu["VA"] = String(totalApparentPower);
 
   docu["KWHR"] = String(phaseAActiveEnergy / 100.0, 2);
   docu["KWHY"] = String(phaseBActiveEnergy / 100.0, 2);
@@ -1670,7 +1667,7 @@ void readAndPublishParams() {
     float IRUW = preferences.getString("IRUW").toFloat();
     float IYUW = preferences.getString("IYUW").toFloat();
     float IBUW = preferences.getString("IBUW").toFloat();
-    //readingsPublishingInterval = preferences.getString("INTERVAL").toInt() * 1000;
+    readingsPublishingInterval = preferences.getString("INTERVAL").toInt() * 1000;
 
     float V1PL = preferences.getString("V1PL").toFloat();
     float V1PU = preferences.getString("V1PU").toFloat();
@@ -1865,7 +1862,7 @@ void readAndPublishParams() {
     }*/
 
     
-
+/*
     Serial.println("========== CALCULATED VALUES ==========");
 
     // Voltage
@@ -2472,7 +2469,7 @@ void readAndPublishParams() {
         Serial.println(" %");
     }
 
-  
+  */
 
 
 
@@ -2738,11 +2735,11 @@ bool publish3PAdvChunks(const String &fullJson) {
 
   bool chunk1Bool = publishChunk(src, 1);
   bool chunk2Bool = publishChunk(src, 2);
-  bool chunk3Bool = publishChunk(src, 3);
-  bool chunk4Bool = publishChunk(src, 4);
+  // bool chunk3Bool = publishChunk(src, 3);
+  // bool chunk4Bool = publishChunk(src, 4);
 
 
-  return chunk1Bool && chunk2Bool && chunk3Bool && chunk4Bool;
+  return chunk1Bool && chunk2Bool;
 }
 
 bool publishChunk(JsonDocument &src, int chunkNo) {
@@ -2753,43 +2750,35 @@ bool publishChunk(JsonDocument &src, int chunkNo) {
   chunk["dateTime"] = src["dateTime"];
   chunk["deviceType"] = src["deviceType"];
   chunk["chunkNo"] = chunkNo;
-  chunk["totalChunks"] = 4;
+  chunk["totalChunks"] = 2;
 
   switch (chunkNo) {
     case 1:
       chunk["VR"] = src["VR"];
       chunk["VY"] = src["VY"];
       chunk["VB"] = src["VB"];
+
       chunk["VRY"] = src["VRY"];
       chunk["VYB"] = src["VYB"];
       chunk["VBR"] = src["VBR"];
+
       chunk["IR"] = src["IR"];
       chunk["IY"] = src["IY"];
       chunk["IB"] = src["IB"];
-      chunk["IAVG"] = src["IAVG"];
-      chunk["VLN_AVG"] = src["VLN_AVG"];
-      chunk["VLL_AVG"] = src["VLL_AVG"];
-      chunk["PF_R"] = src["PF_R"];
-      chunk["PF_Y"] = src["PF_Y"];
-      chunk["PF_B"] = src["PF_B"];
-      chunk["PF_TOTAL"] = src["PF_TOTAL"];
-      chunk["FREQ"] = src["FREQ"];
-      chunk["WATTS_R"] = src["WATTS_R"];
-      chunk["WATTS_Y"] = src["WATTS_Y"];
-      chunk["WATTS_B"] = src["WATTS_B"];
-      chunk["WATTS_TOTAL"] = src["WATTS_TOTAL"];
-      chunk["VAR_R"] = src["VAR_R"];
-      chunk["VAR_Y"] = src["VAR_Y"];
-      chunk["VAR_B"] = src["VAR_B"];
-      chunk["VAR_TOTAL"] = src["VAR_TOTAL"];
-      chunk["VA_R"] = src["VA_R"];
-      chunk["VA_Y"] = src["VA_Y"];
-      chunk["VA_B"] = src["VA_B"];
-      chunk["VA_TOTAL"] = src["VA_TOTAL"];
+
       chunk["MAX_VDP_LN"] = src["MAX_VDP_LN"];
       chunk["MAX_VDP_LL"] = src["MAX_VDP_LL"];
       chunk["MAX_VDP_I"] = src["MAX_VDP_I"];
 
+      chunk["VLN_AVG"] = src["VLN_AVG"];
+      chunk["VLL_AVG"] = src["VLL_AVG"];
+      chunk["IAVG"] = src["IAVG"];
+
+      chunk["PF"] = src["PF"];
+      chunk["FREQ"] = src["FREQ"];
+      chunk["WT"] = src["WT"];
+      chunk["VAR"] = src["VAR"];
+      chunk["VA"] = src["VA"];
       break;
 
     case 2:
@@ -2797,63 +2786,13 @@ bool publishChunk(JsonDocument &src, int chunkNo) {
       chunk["KWHY"] = src["KWHY"];
       chunk["KWHB"] = src["KWHB"];
       chunk["KWH_TOTAL"] = src["KWH_TOTAL"];
-      chunk["KVARH_R"] = src["KVARH_R"];
-      chunk["KVARH_Y"] = src["KVARH_Y"];
-      chunk["KVARH_B"] = src["KVARH_B"];
-      chunk["KVARH_TOTAL"] = src["KVARH_TOTAL"];
-      chunk["KVAH_R"] = src["KVAH_R"];
-      chunk["KVAH_Y"] = src["KVAH_Y"];
-      chunk["KVAH_B"] = src["KVAH_B"];
-      chunk["KVAH_TOTAL"] = src["KVAH_TOTAL"];
-      chunk["POWER_DIRECTION"] = src["POWER_DIRECTION"];
-      chunk["ALARM_STATUS"] = src["ALARM_STATUS"];
-      chunk["KWH_POS_R"] = src["KWH_POS_R"];
-      chunk["KWH_POS_Y"] = src["KWH_POS_Y"];
-      chunk["KWH_POS_B"] = src["KWH_POS_B"];
-      chunk["KWH_POS_TOTAL"] = src["KWH_POS_TOTAL"];
-      chunk["KWH_REV_R"] = src["KWH_REV_R"];
-      chunk["KWH_REV_Y"] = src["KWH_REV_Y"];
-      chunk["KWH_REV_B"] = src["KWH_REV_B"];
-      chunk["KWH_REV_TOTAL"] = src["KWH_REV_TOTAL"];
-      chunk["KVARH_POS_R"] = src["KVARH_POS_R"];
-      chunk["KVARH_POS_Y"] = src["KVARH_POS_Y"];
-      chunk["KVARH_POS_B"] = src["KVARH_POS_B"];
-      chunk["KVARH_POS_TOTAL"] = src["KVARH_POS_TOTAL"];
-      chunk["KVARH_REV_R"] = src["KVARH_REV_R"];
-      chunk["KVARH_REV_Y"] = src["KVARH_REV_Y"];
-      chunk["KVARH_REV_B"] = src["KVARH_REV_B"];
-      chunk["KVARH_REV_TOTAL"] = src["KVARH_REV_TOTAL"];
 
-
-      break;
-
-    case 3:
-      
-
-      chunk["UAB"] = src["UAB"];
-      chunk["UBC"] = src["UBC"];
-      chunk["UCA"] = src["UCA"];
-      chunk["UAB_ANGLE"] = src["UAB_ANGLE"];
-      chunk["UBC_ANGLE"] = src["UBC_ANGLE"];
-      chunk["UCA_ANGLE"] = src["UCA_ANGLE"];
-      chunk["IAB_ANGLE"] = src["IAB_ANGLE"];
-      chunk["IBC_ANGLE"] = src["IBC_ANGLE"];
-      chunk["ICA_ANGLE"] = src["ICA_ANGLE"];
-      chunk["UA_IA_ANGLE"] = src["UA_IA_ANGLE"];
-      chunk["UB_IB_ANGLE"] = src["UB_IB_ANGLE"];
-      chunk["UC_IC_ANGLE"] = src["UC_IC_ANGLE"];
       chunk["VHR"] = src["VHR"];
       chunk["VHY"] = src["VHY"];
       chunk["VHB"] = src["VHB"];
       chunk["IHR"] = src["IHR"];
       chunk["IHY"] = src["IHY"];
       chunk["IHB"] = src["IHB"];
-      
-      chunk["ALGEBRAIC_ACTIVE_ENERGY"] = src["ALGEBRAIC_ACTIVE_ENERGY"];
-      chunk["ALGEBRAIC_REACTIVE_ENERGY"] = src["ALGEBRAIC_REACTIVE_ENERGY"];
-
-      break;
-      case 4:
 
       chunk["HarR3V"] = src["HarR3V"];
       chunk["HarY3V"] = src["HarY3V"];
@@ -2861,31 +2800,22 @@ bool publishChunk(JsonDocument &src, int chunkNo) {
       chunk["HarR3I"] = src["HarR3I"];
       chunk["HarY3I"] = src["HarY3I"];
       chunk["HarB3I"] = src["HarB3I"];
+
       chunk["HarR5V"] = src["HarR5V"];
       chunk["HarY5V"] = src["HarY5V"];
       chunk["HarB5V"] = src["HarB5V"];
       chunk["HarR5I"] = src["HarR5I"];
       chunk["HarY5I"] = src["HarY5I"];
       chunk["HarB5I"] = src["HarB5I"];
+
       chunk["HarR7V"] = src["HarR7V"];
       chunk["HarY7V"] = src["HarY7V"];
       chunk["HarB7V"] = src["HarB7V"];
       chunk["HarR7I"] = src["HarR7I"];
       chunk["HarY7I"] = src["HarY7I"];
       chunk["HarB7I"] = src["HarB7I"];
-      chunk["CrestVR"] = src["CrestVR"];
-      chunk["CrestVY"] = src["CrestVY"];
-      chunk["CrestVB"] = src["CrestVB"];
-      chunk["CrestIR"] = src["CrestIR"];
-      chunk["CrestIY"] = src["CrestIY"];
-      chunk["CrestIB"] = src["CrestIB"];
-      chunk["KFactorVR"] = src["KFactorVR"];
-      chunk["KFactorVY"] = src["KFactorVY"];
-      chunk["KFactorVB"] = src["KFactorVB"];
-      chunk["KFactorIR"] = src["KFactorIR"];
-      chunk["KFactorIY"] = src["KFactorIY"];
-      chunk["KFactorIB"] = src["KFactorIB"];
       break;
+      
   }
 
   String payload;
