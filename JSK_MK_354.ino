@@ -48,7 +48,7 @@ String longitude;
 unsigned long baseMillis = 0;
 time_t baseEpoch = 0;
 
-String deviceType ;
+String deviceType = "3P-Adv";
 
 // SD Card Pin Definitions
 #define SD_CS_PIN 48  // SD Card uses HSPI pins
@@ -2683,7 +2683,9 @@ void readAndPublishParams() {
                                                          dt, IDPU, 8)) { publish = true; };
     }
 
-    if (publish == true && published == false) {
+    if (publish == true &&
+    published == false &&
+    (currentMillis - previouslyPublishedMillis >= readingsPublishingInterval)) {
       if (mqtt.connected()) {
 
         /* Publish the data */
