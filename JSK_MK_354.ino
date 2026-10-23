@@ -3184,6 +3184,7 @@ void publishBreach(String thresholdLower, String thresholdUpper, String readValu
   }
   if (mqtt.connected()) {
     mqtt.publish("pqm", alert.c_str());
+    delay(200);
     // Serial.println(++count);
     // mqtt.publish("pqm", readings.c_str());
   }
@@ -3217,6 +3218,7 @@ void publishBreach1(String thresholdUpper, String readValue, String paramBreache
   }
   if (mqtt.connected()) {
     mqtt.publish("pqm", alert.c_str());
+    delay(200);
     // Serial.println(++count);
     // mqtt.publish("pqm", readings.c_str());
   }
@@ -3249,6 +3251,7 @@ void publishLowerBreach1(String thresholdLower, String readValue, String paramBr
   }
   if (mqtt.connected()) {
     mqtt.publish("pqm", alert.c_str());
+    delay(200);
     // Serial.println(++count);
     // mqtt.publish("pqm", readings.c_str());
   }
@@ -3282,6 +3285,7 @@ void publishUpperCriticalBreach1(String thresholdUpper, String readValue, String
   }
   if (mqtt.connected()) {
     mqtt.publish("pqm", alert.c_str());
+    delay(200);
     // Serial.println(++count);
     // mqtt.publish("pqm", readings.c_str());
   }
