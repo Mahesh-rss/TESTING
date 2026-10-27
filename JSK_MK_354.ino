@@ -1499,7 +1499,7 @@ void addJSY354MainValues(JsonDocument &docu, uint16_t *allRegs)
   docu["VA_R"] = String(allRegs[16]);
   docu["VA_Y"] = String(allRegs[17]);
   docu["VA_B"] = String(allRegs[18]);
-  docu["VA"] = String(totalApparentPower);
+  docu["VA_TOTAL"] = String(totalApparentPower);
 
   docu["KWHR"] = String(phaseAActiveEnergy / 100.0, 2);
   docu["KWHY"] = String(phaseBActiveEnergy / 100.0, 2);
@@ -2683,12 +2683,12 @@ void readAndPublishParams() {
                                                          dt, IDPU, 8)) { publish = true; };
     }
 
-    if (publish == true &&
+   /* if (publish == true &&
     published == false &&
     (currentMillis - previouslyPublishedMillis >= readingsPublishingInterval)) {
       if (mqtt.connected()) {
 
-        /* Publish the data */
+        /* Publish the data 
         if (deviceType.equals("1P-Basic") || deviceType.equals("3P-Basic")) {
           String readingsData = String(jsonString);
           Serial.print("Data to be published: ");
@@ -2720,7 +2720,7 @@ void readAndPublishParams() {
       } else {
         Serial.println("MQTT not connected, can't publish Readings.");
       }
-    }
+    }*/
     Serial.println("*****************************************************************");
   } else {
     delay(50);
@@ -2780,7 +2780,7 @@ bool publishChunk(JsonDocument &src, int chunkNo) {
       chunk["FREQ"] = src["FREQ"];
       chunk["WT"] = src["WT"];
       chunk["VAR"] = src["VAR"];
-      chunk["VA"] = src["VA"];
+      chunk["VA_TOTAL"] = src["VA_TOTAL"];
       break;
 
     case 2:
@@ -3075,10 +3075,11 @@ bool checkThresholdBreach(float value, float lowerWarning, float upperWarning, f
     if (value < lowerCritical || value > upperCritical) {
       publishBreach(String(lowerCritical), String(upperCritical), String(value), phase, "Critical", readings, dt, eventId);
       flag = true;
-    } else {
+    } 
+    /*else {
       warningOccured = true;
       publishBreach(String(lowerWarning), String(upperWarning), String(value), phase, "Warning", readings, dt, eventId);
-    }
+    }*/
   }
 
   // if (value < lowerCritical || value > upperCritical) {
@@ -3102,10 +3103,11 @@ bool checkSingleThresholdBreach(float value, float upperWarning, float upperCrit
     if (value > upperCritical) {
       publishBreach1(String(upperCritical), String(value), phase, "Critical", readings, dt, eventId);
       flag = true;
-    } else {
+    } 
+    /*else {
       warningOccured = true;
       publishBreach1(String(upperWarning), String(value), phase, "Warning", readings, dt, eventId);
-    }
+    }*/
   }
 
   // if (value > upperCritical) {
@@ -3124,10 +3126,11 @@ bool checkSingleLowerThresholdBreach(float value, float lowerWarning, float lowe
     if (value < lowerCritical) {
       publishLowerBreach1(String(lowerCritical), String(value), phase, "Critical", readings, dt);
       flag = true;
-    } else {
+    } 
+    /*else {
       warningOccured = true;
       publishLowerBreach1(String(lowerWarning), String(value), phase, "Warning", readings, dt);
-    }
+    }*/
   }
 
   // if (value < lowerCritical) {
